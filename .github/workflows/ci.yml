@@ -45,11 +45,15 @@ jobs:
       - name: Build the application
         run: npm run build
   lint:
-      name: Lintering
+      name: 'Lintering'
+      default:
+        run:
+           shell: bash
+           working-directory: ./web
       run-on: ubuntu-latest
       steps:
        - name: Checkout
-         run: actions/checkout@v2
+         uses: actions/checkout@v2
        - name: node version
          uses: actions/setup-node@v2
          with:
@@ -58,7 +62,7 @@ jobs:
          run: npm install
        - name: testing 
          run: npm run test
-       - name: Lintering
+       - name: 'Lintering'
          run: npx standard -v
 
   deploy:
