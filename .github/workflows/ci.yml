@@ -45,6 +45,7 @@ jobs:
       - name: Build the application
         run: npm run build
   lint:
+      name: Lintering
       run-on: ubuntu-latest
       steps:
        - name: Checkout
