@@ -18,18 +18,15 @@ jobs:
   build:
     runs-on: ubuntu-latest  # The environment to run the job
 
-    # Strategy to test on multiple Node.js versions (optional)
-   
-
     # The steps for the build job
     steps:
       # Checkout the repository code
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Set up the required Node.js version
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "20.x"
 
@@ -44,38 +41,43 @@ jobs:
       # Build the application (if applicable)
       - name: Build the application
         run: npm run build
+
   lint:
-      name: 'Lintering'
-      default:
-        run:
-           shell: bash
-           working-directory: ./web
-      run-on: ubuntu-latest
-      steps:
-       - name: Checkout
-         uses: actions/checkout@v2
-       - name: node version
-         uses: actions/setup-node@v2
-         with:
+    runs-on: ubuntu-latest  # Corrected 'runs-on'
+    name: 'Linting'
+
+    steps:
+      # Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up the required Node.js version
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
           node-version: "20.x"
-       - name: install dependencies
-         run: npm install
-       - name: testing 
-         run: npm run test
-       - name: 'Lintering'
-         run: npx standard -v
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./web  # Corrected placement of working-directory
+
+      # Run linting
+      - name: Linting
+        run: npx standard -v
+        working-directory: ./web  # Corrected placement of working-directory
 
   deploy:
     runs-on: ubuntu-latest
-    needs: ['build','lint']  # This ensures the build job passes before running deployment
+    needs: ['build', 'lint']  # Ensures the build and lint jobs pass before running deployment
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Set up Node.js (same as the build job)
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "20.x"
 
@@ -84,9 +86,8 @@ jobs:
         run: npm install
 
       # Deploy the app (this can be done via SSH, FTP, or other deployment strategies)
-      # Example deployment via SSH (you would set up SSH keys in GitHub Secrets)
       - name: Deploy to production server
         run: |
-          ssh ubuntu@ec2-52-66-134-93.ap-south-1.compute.amazonaws.com 'cd /path/to/project && git pull && npm install && npm run build && pm2 restart app'
+          ssh ubuntu@ec2-52-66-134-93.ap-south-1.compute.amazonaws.com 'cd ./web && git pull && npm install && npm run build && pm2 restart app'
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
